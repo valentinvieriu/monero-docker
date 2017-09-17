@@ -5,13 +5,15 @@ services:
     image: 'valentinvieriu/monero:latest'
     build: .
     restart: 'unless-stopped'
-    dns:
-      - 8.8.8.8
-      - 9.9.9.9
-    # environment: 
-    #   REGISTRY_HTTP_SECRET: '${REGISTRY_HTTP_SECRET}'
-    #   VIRTUAL_HOST: 'https://registry.${TLD}'
-    #   # EXCLUDE_BASIC_AUT: =true
+    # dns:
+    #   - 8.8.8.8
+    #   - 9.9.9.9
+    # network_mode: host
+    # stdin_open: true
+    # ports:
+    #     - 18080:18080
+    #     - 18081:18081
     volumes:
-      - ${ROOT_FOLDER}/blockchain/data:/root/.bitmonero
+      - ${ROOT_FOLDER}/blockchain:/root/.bitmonero
       - ${ROOT_FOLDER}/wallet/monero_temp:/wallet
+    command: ["--non-interactive", "--rpc-bind-ip=0.0.0.0", "--confirm-external-bind", "--fast-block-sync=1", "--start-mining=42vVt8DmDS5i47Dop7Q8MiVZmwx67oh7QPXtfEsMWGxoCUymMtZVfAPdCmx2X7V9eGdhNVz2KLrEKE5Wn3fiUaeDE6zmSDa"]
