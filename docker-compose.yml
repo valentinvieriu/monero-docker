@@ -1,0 +1,17 @@
+version: '2.2'
+services:
+  monero:
+    container_name: monero
+    image: 'valentinvieriu/monero:latest'
+    build: .
+    restart: 'unless-stopped'
+    dns:
+      - 8.8.8.8
+      - 9.9.9.9
+    # environment: 
+    #   REGISTRY_HTTP_SECRET: '${REGISTRY_HTTP_SECRET}'
+    #   VIRTUAL_HOST: 'https://registry.${TLD}'
+    #   # EXCLUDE_BASIC_AUT: =true
+    volumes:
+      - ${ROOT_FOLDER}/blockchain/data:/root/.bitmonero
+      - ${ROOT_FOLDER}/wallet/monero_temp:/wallet
