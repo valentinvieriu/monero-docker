@@ -1,4 +1,4 @@
-version: '2.2'
+version: '2.3'
 services:
   monero:
     image: 'valentinvieriu/monero:${MONERO_VERSION}'
@@ -9,10 +9,50 @@ services:
         - MONERO_SHA=${MONERO_SHA}
     restart: 'unless-stopped'
     stdin_open: true
+    # init: true
     ports:
         - 18080:18080
         - 18081:18081
     volumes:
-      - ${ROOT_FOLDER}/blockchain:/root/.bitmonero
-      # - ${ROOT_FOLDER}/wallets/monero_temp:/wallet
-    command: ["--non-interactive","--log-level=0","--rpc-bind-ip=0.0.0.0", "--confirm-external-bind", "--fast-block-sync=1"]
+      - ${ROOT_FOLDER}/data:/root/.bitmonero
+    command: "\
+      --non-interactive \
+      --log-level=0 \
+      --rpc-bind-ip=0.0.0.0 \
+      --rpc-login ${RPC_USERNAME}:${RPC_PASSWROD} \
+      --confirm-external-bind \
+      --fast-block-sync=1 \
+      --db-sync-mode=fast \
+      --db-salvage \
+      "
+
+  wallet:
+    image: 'valentinvieriu/monero:${MONERO_VERSION}'
+    stdin_open: true
+    volumes:
+      - ${ROOT_FOLDER}/data:/root/.bitmonero
+    entrypoint: ["monero-wallet-cli"]
+    command: "\
+      --wallet-file /root/.bitmonero/wallets/${WALLET_NAME}/${WALLET_NAME} \
+      --daemon-login ${RPC_USERNAME}:${RPC_PASSWROD} \
+      --daemon-host monero \
+      "
+
+  export:
+    image: 'valentinvieriu/monero:${MONERO_VERSION}'
+    stdin_open: true
+    volumes:
+      - ${ROOT_FOLDER}/data:/root/.bitmonero
+    entrypoint: ["monero-blockchain-export"]
+
+  import:
+    image: 'valentinvieriu/monero:${MONERO_VERSION}'
+    stdin_open: true
+    volumes:
+      - ${ROOT_FOLDER}/data:/root/.bitmonero
+    entrypoint: ["monero-blockchain-import"]
+    command: "\
+      --batch-size 20000 \
+      --database lmdb#fastest \
+      --verify off \
+      "
