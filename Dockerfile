@@ -3,14 +3,18 @@ FROM ubuntu:16.04
 MAINTAINER valentinvieriu <valentinvieriu@users.noreply.github.com>
 LABEL description="MoneroD in Docker. Full node."
 
-WORKDIR /root
+ARG MONERO_VERSION=0.11.1.0
+ENV MONERO_VERSION $MONERO_VERSION
+ARG MONERO_SHA=6581506f8a030d8d50b38744ba7144f2765c9028d18d990beb316e13655ab248
+ENV MONERO_SHA $MONERO_SHA
 
+WORKDIR /root
 RUN apt-get update \
     && apt-get -y --no-install-recommends install bzip2 ca-certificates curl \
-    && curl -L -O https://downloads.getmonero.org/cli/monero-linux-x64-v0.11.0.0.tar.bz2 \
-    && echo 'fa7742c822f3c966aa842bf20a9920803d690d9db02033d9b397cefc7cc07ff4  monero-linux-x64-v0.11.0.0.tar.bz2' | sha256sum -c - \
-    && tar -jxvf monero-linux-x64-v0.11.0.0.tar.bz2 \
-    && rm monero-linux-x64-v0.11.0.0.tar.bz2 \
+    && curl -SLO "https://downloads.getmonero.org/cli/monero-linux-x64-v$MONERO_VERSION.tar.bz2" \
+    && echo "$MONERO_SHA  monero-linux-x64-v$MONERO_VERSION.tar.bz2" | sha256sum -c - \
+    && tar -jxvf "monero-linux-x64-v$MONERO_VERSION.tar.bz2" \
+    && rm "monero-linux-x64-v$MONERO_VERSION.tar.bz2" \
     && mv monero-*/monerod /usr/local/bin/monerod \
     && chmod a+x /usr/local/bin/monerod \
     && rm -r monero-* \
